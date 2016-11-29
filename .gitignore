@@ -1,0 +1,9 @@
+node_modules
+.tmp
+.idea
+dist
+.publish
+_test
+_demo
+_ignore
+*.sublime-*

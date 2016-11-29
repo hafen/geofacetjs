@@ -1,0 +1,21 @@
+html, body {
+  margin: 0px;
+  overflow: hidden;
+}
+
+.geofacet-app {
+  font-family: "Gidole-Regular",
+  sans-serif;
+  line-height: normal;
+  color: '#392D1C';
+}
+
+.grid line {
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}

@@ -1,0 +1,12 @@
+node_modules
+.tmp
+.idea
+src
+.publish
+_demo
+_test
+_ignore
+*.sublime-*
+webpack*
+index.html
+server.js

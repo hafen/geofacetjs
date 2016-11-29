@@ -1,0 +1,13 @@
+export const SET_APP_ID = 'SET_APP_ID';
+export const SET_MAP = 'SET_MAP';
+export const SET_MAP_LOADED = 'SET_MAP_LOADED';
+export const SET_COUNTRIES = 'SET_COUNTRIES';
+export const SET_VARIABLE = 'SET_VARIABLE';
+export const SET_SELECTED = 'SET_SELECTED';
+export const SET_GEOJSON_COUNTRIES = 'SET_GEOJSON_COUNTRIES';
+export const SET_GEOJSON_PROVINCES = 'SET_GEOJSON_PROVINCES';
+export const SET_APP_BBOX = 'SET_APP_BBOX';
+export const SET_HOVER_INFO = 'SET_HOVER_INFO';
+export const SET_COUNTRY_DATA = 'SET_COUNTRY_DATA';
+export const SET_PROVINCE_DATA = 'SET_PROVINCE_DATA';
+export const SET_VIEW_MODE = 'SET_VIEW_MODE';
