@@ -15,12 +15,14 @@ import SeriesPlot from './SeriesPlot';
 //   - if nothing hovered, show "Hover a country for info"
 //   - if country hovered, show country-level info + "Click to view states/provinces"
 
-const addCommas = x =>
-  x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+// const addCommas = x =>
+//   x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-const InfoOverlay = ({ sheet: { classes }, hoverInfo, xrange, yrange }) => {
+const InfoOverlay = ({ sheet: { classes }, hoverInfo, xrange, yrange, viewMode }) => {
   let res = <div />;
-  if (hoverInfo.name === undefined) {
+  if (viewMode === 'grid') {
+    res = <div />;
+  } else if (hoverInfo.name === undefined) {
     res = (
       <div className={classes.overlay}>
         <h3 className={classes.hInfo}>Hover a country for info</h3>
@@ -59,7 +61,7 @@ const InfoOverlay = ({ sheet: { classes }, hoverInfo, xrange, yrange }) => {
           />
         </div>
         <dl className={classes.dl}>
-          <dt className={classes.dt}><strong>Average Value</strong></dt>
+          <dt className={classes.dt}><strong>Avg. Value</strong></dt>
           <dd className={classes.dd}>{Math.round(hoverInfo.properties.avg_val)}</dd>
         </dl>
         <div>
@@ -116,7 +118,8 @@ InfoOverlay.propTypes = {
   sheet: React.PropTypes.object,
   hoverInfo: React.PropTypes.object,
   xrange: React.PropTypes.array,
-  yrange: React.PropTypes.array
+  yrange: React.PropTypes.array,
+  viewMode: React.PropTypes.string
 };
 
 // ------ static styles ------
@@ -185,13 +188,15 @@ const staticStyles = {
 
 const hoverInfoSelector = state => state.hoverInfo;
 const countryDataSelector = state => state.countryData;
+const viewModeSelector = state => state.viewMode;
 
 const stateSelector = createSelector(
-  hoverInfoSelector, countryDataSelector,
-  (hoverInfo, cd) => ({
+  hoverInfoSelector, countryDataSelector, viewModeSelector,
+  (hoverInfo, cd, viewMode) => ({
     hoverInfo,
     xrange: cd.xExtent,
-    yrange: cd.yExtent
+    yrange: cd.yExtent,
+    viewMode
   })
 );
 

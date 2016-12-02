@@ -19,3 +19,40 @@ html, body {
 .grid path {
   stroke-width: 0;
 }
+
+.axis {
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  font-size: 9px;
+}
+
+.grid .tick {
+  stroke: lightgrey;
+  opacity: 0.7;
+}
+
+.grid path {
+  stroke-width: 1;
+}
+
+.x.axis .minor {
+  stroke-opacity: .5;
+}
+
+.axis .domain {
+  stroke-width: 0;
+}
+
+.axis .tick line {
+  stroke: #000;
+  stroke-width: 0.5;
+  stroke-opacity: 0.25;
+}
+
+.mapboxgl-ctrl-compass { display: none; }
+
+.mapbox-improve-map { display: none; }
+
+.mapboxgl-control-container { display: none; }

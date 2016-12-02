@@ -1,6 +1,6 @@
 import { SET_VIEW_MODE, SET_APP_ID, SET_MAP, SET_MAP_LOADED, SET_COUNTRIES,
   SET_GEOJSON_COUNTRIES, SET_GEOJSON_PROVINCES, SET_HOVER_INFO,
-  SET_APP_BBOX, SET_VARIABLE, SET_SELECTED,
+  SET_APP_BBOX, SET_VARIABLE, SET_SELECTED, SET_ERROR_MESSAGE,
   SET_COUNTRY_DATA, SET_PROVINCE_DATA } from '../constants';
 
 export const viewMode = (state = 'geo', action) => {
@@ -115,6 +115,15 @@ export const appBBox = (state = null, action) => {
   switch (action.type) {
     case SET_APP_BBOX:
       return action.bbox;
+    default:
+  }
+  return state;
+};
+
+export const errorMsg = (state = '', action) => {
+  switch (action.type) {
+    case SET_ERROR_MESSAGE:
+      return action.msg;
     default:
   }
   return state;

@@ -1,8 +1,8 @@
 // import { json as d3json } from 'd3-request';
 // import { default as getJSONP } from 'browser-jsonp';
-import { SET_VIEW_MODE, SET_MAP_LOADED, SET_APP_BBOX, SET_HOVER_INFO, SET_SELECTED,
-  SET_GEOJSON_COUNTRIES, SET_GEOJSON_PROVINCES,
-  SET_COUNTRY_DATA, SET_PROVINCE_DATA } from '../constants';
+import { SET_VIEW_MODE, SET_MAP_LOADED, SET_APP_BBOX, SET_HOVER_INFO,
+  SET_SELECTED, SET_GEOJSON_COUNTRIES, SET_GEOJSON_PROVINCES, SET_ERROR_MESSAGE,
+  SET_COUNTRY_DATA, SET_PROVINCE_DATA, WINDOW_RESIZE } from '../constants';
 
 // SET_APP_ID, SET_MAP, SET_VARIABLE
 
@@ -43,4 +43,12 @@ export const setProvinceData = data => ({
 
 export const setAppBBox = bbox => ({
   type: SET_APP_BBOX, bbox
+});
+
+export const setErrorMessage = msg => ({
+  type: SET_ERROR_MESSAGE, msg
+});
+
+export const windowResize = dims => ({
+  type: WINDOW_RESIZE, dims
 });

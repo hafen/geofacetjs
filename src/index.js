@@ -13,11 +13,12 @@ import mapboxgl from 'mapbox-gl/dist/mapbox-gl';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import { blueA200, lightBlue700, redA200 } from 'material-ui/styles/colors';
-import 'react-virtualized/styles.css'; // only needs to be imported once
 
 import { setMapLoaded, setAppBBox, setSelected, setHoverInfo,
-  setGeoJsonCountries, setGeoJsonProvinces,
-  setCountryData, setProvinceData } from './actions';
+  setGeoJsonCountries, setGeoJsonProvinces, setErrorMessage,
+  setCountryData, setProvinceData, windowResize } from './actions';
+
+import { hexToRGB, getXYData } from './misc';
 
 import './assets/styles/main.css';
 // import './assets/fonts/IcoMoon/style.css';
@@ -29,23 +30,12 @@ import App from './App';
 
 import { countries } from './appData'; // varLookup
 
-const hexToRGB = (hex, bhex, a = 1, a2 = a) => {
-  const h = '0123456789ABCDEF';
-  const hx = hex.toUpperCase();
-  const bhx = bhex.toUpperCase();
-  const r3 = (h.indexOf(hx[1]) * 16) + h.indexOf(hx[2]);
-  const g3 = (h.indexOf(hx[3]) * 16) + h.indexOf(hx[4]);
-  const b3 = (h.indexOf(hx[5]) * 16) + h.indexOf(hx[6]);
-  const r2 = (h.indexOf(bhx[1]) * 16) + h.indexOf(bhx[2]);
-  const g2 = (h.indexOf(bhx[3]) * 16) + h.indexOf(bhx[4]);
-  const b2 = (h.indexOf(bhx[5]) * 16) + h.indexOf(bhx[6]);
-
-  // http://stackoverflow.com/questions/12228548/finding-equivaent-color-with-opacity
-  const r1 = Math.max(Math.min(((r3 - r2) + (r2 * a)) / a, 255), 0);
-  const g1 = Math.max(Math.min(((g3 - g2) + (g2 * a)) / a, 255), 0);
-  const b1 = Math.max(Math.min(((b3 - b2) + (b2 * a)) / a, 255), 0);
-
-  return `rgba(${r1}, ${g1}, ${b1}, ${a2})`;
+const webglSupport = () => {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!window.WebGLRenderingContext &&
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+  } catch (e) { return false; }
 };
 
 class Root extends Component {
@@ -53,8 +43,8 @@ class Root extends Component {
     super(props);
 
     const el = document.getElementById(this.props.appId);
-    el.style.width = `${window.innerWidth}px`;
-    el.style.height = `${window.innerHeight}px`;
+    el.style.width = '100vw';
+    el.style.height = '100vh';
     el.style.position = 'absolute';
     // el.style.overflow = 'hidden';
     el.style.top = 0;
@@ -62,12 +52,12 @@ class Root extends Component {
     el.style.zIndex = 2;
     el.style.pointerEvents = 'none';
     const mapDiv = document.createElement('div');
-    mapDiv.style.width = `${window.innerWidth}px`;
-    mapDiv.style.height = `${window.innerHeight}px`;
+    mapDiv.style.width = '100vw';
+    mapDiv.style.height = '100vh';
     mapDiv.style.position = 'absolute';
     mapDiv.style.top = 0;
     mapDiv.style.left = 0;
-    mapDiv.style.zIndex = -1;
+    // mapDiv.style.zIndex = 1;
     mapDiv.id = 'map';
     // mapDiv.style.overflow = 'hidden';
     // el.appendChild(mapDiv);
@@ -78,6 +68,7 @@ class Root extends Component {
       container: 'map',
       // style: 'mapbox://styles/rhafen/civva1zta00052js3cjs98fs3',
       style: 'mapbox://styles/mapbox/light-v9',
+      attributionControl: false,
       center: [0, 0],
       zoom: 0
     });
@@ -88,6 +79,10 @@ class Root extends Component {
       { appId: this.props.appId, map, mapLoaded: false, countries, variable: 2 },
       applyMiddleware(thunkMiddleware, loggerMiddleware)
     );
+
+    if (!webglSupport()) {
+      this.store.dispatch(setErrorMessage('WebGL is needed to run this application.'));
+    }
 
     map.on('load', () => {
       this.store.dispatch(setMapLoaded(true));
@@ -129,8 +124,11 @@ class Root extends Component {
       const x = countryCodes[0];
       countryCodes.splice(0, 1);
 
-      d3json(`../../data/geojson/country/${x}.geojson`, (err, json) => {
-        // if (err) { console.error(err); }
+      d3json(`./data/geojson/country/${x}.geojson`, (err, json) => {
+        if (err) {
+          this.store.dispatch(
+            setErrorMessage(`Couldn't load data for ${x}`));
+        }
         const mn = this.store.getState().countryData.means[x];
         for (let i = 0; i < json.features.length; i += 1) {
           // eslint-disable-next-line no-param-reassign
@@ -139,6 +137,11 @@ class Root extends Component {
           json.features[i].properties.gridx = countries[x].gridx;
           // eslint-disable-next-line no-param-reassign
           json.features[i].properties.gridy = countries[x].gridy;
+          if (json.features[i].properties.geounit === 'Democratic Republic of the Congo') {
+            // eslint-disable-next-line no-param-reassign
+            json.features[i].properties.geounit = 'Dem. Rep. Congo';
+          }
+
           countryDataGeo.features.push(json.features[i]);
         }
         bboxes[x] = geojsonExtent(json);
@@ -147,7 +150,7 @@ class Root extends Component {
     };
 
     // load country data
-    d3json(`../../data/mpc/country/${this.props.varNum}.json`, (err, json) => {
+    d3json(`./data/mpc/country/${this.props.varNum}.json`, (err, json) => {
       // if (err) { console.error(err); }
       // compute means and extents
       const means = {};
@@ -188,35 +191,22 @@ class Root extends Component {
       loadCountriesGeo();
     });
 
-    // hover
+    // hover (throttled)
+    let __mousemoveWait = false;
     map.on('mousemove', (e) => {
-      if (map.getLayer('country-fills')) {
-        const features = map.queryRenderedFeatures(e.point,
-          { layers: ['country-fills'] });
-        if (features.length) {
-          map.setFilter('country-fills-hover', ['==', 'name',
-            features[0].properties.name]);
-          this.setHover(features[0].properties, 'country');
-          map.getCanvas().style.cursor = 'pointer';
-        } else {
-          map.setFilter('country-fills-hover', ['==', 'name', '']);
-          this.unsetHover();
-          map.getCanvas().style.cursor = '';
+      if (!__mousemoveWait) {
+        if (map.getLayer('country-fills')) {
+          const features = map.queryRenderedFeatures(e.point,
+            { layers: ['country-fills'] });
+          this.setHover(features, 'country', map);
         }
-      }
-
-      if (map.getLayer('province-fills')) {
-        const pfeatures = map.queryRenderedFeatures(e.point,
-          { layers: ['province-fills'] });
-        if (pfeatures.length) {
-          map.setFilter('province-fills-hover', ['==', 'name',
-            pfeatures[0].properties.name]);
-          this.setHover(pfeatures[0].properties, 'province');
-          // map.getCanvas().style.cursor = 'pointer';
-        } else {
-          map.setFilter('province-fills-hover', ['==', 'name', '']);
-          // map.getCanvas().style.cursor = '';
+        if (map.getLayer('province-fills')) {
+          const pfeatures = map.queryRenderedFeatures(e.point,
+            { layers: ['province-fills'] });
+          this.setHover(pfeatures, 'province', map);
         }
+        __mousemoveWait = true;
+        setTimeout(() => { __mousemoveWait = false; }, 100);
       }
     });
 
@@ -246,17 +236,18 @@ class Root extends Component {
       }
     });
 
-    // // resize handler only when in fullscreen mode (which is always for SPA)
-    // window.addEventListener('resize', () => {
-    //   if (this.store.getState().fullscreen) {
-    //     this.store.dispatch(windowResize({
-    //       height: window.innerHeight,
-    //       width: window.innerWidth
-    //     }));
-    //   }
-    // });
-
-    // this.store.dispatch(windowResize(appDims));
+    let __resizeWait = false;
+    window.addEventListener('resize', () => {
+      if (!__resizeWait) {
+        map.resize();
+        this.store.dispatch(windowResize({
+          height: window.innerHeight,
+          width: window.innerWidth
+        }));
+      }
+      __resizeWait = true;
+      setTimeout(() => { __resizeWait = false; }, 100);
+    });
 
     this.muiTheme = getMuiTheme({
       fontFamily: '"Open Sans", sans-serif',
@@ -292,16 +283,18 @@ class Root extends Component {
   }
   setZoomCountry(properties, map) {
     const code = properties.adm0_a3_us;
-debugger;
+
     // if we don't have province data, load it and re-call setZoomCountry
     const pdc = this.store.getState().provinceData[code];
     if (!pdc || !pdc[this.props.varNum]) {
-      d3json(`../../data/mpc/province/${code}/${this.props.varNum}.json`, (err, json) => {
+      d3json(`./data/mpc/province/${code}/${this.props.varNum}.json`, (err, json) => {
         if (err) {
           // if the file doesn't exist, we will populate an empty entry
           this.store.dispatch(setProvinceData({
             [code]: { [this.props.varNum]: {} }
           }));
+          // this.store.dispatch(
+          //   setErrorMessage(`Couldn't load data for ${code}`));
         } else {
           const means = {};
           const keys = Object.keys(json.provinces);
@@ -318,7 +311,7 @@ debugger;
       const provinceData = pdc[this.props.varNum];
       const provinceDataGeo = this.store.getState().geojsonProvinces[code];
       if (!provinceDataGeo) {
-        d3json(`../../data/geojson/province/${code}.geojson`, (err, json) => {
+        d3json(`./data/geojson/province/${code}.geojson`, (err, json) => {
           // if (err) { console.error(err); }
           // set province-level means if specified
           // otherwise just use the country-level avg_val
@@ -362,35 +355,42 @@ debugger;
       }
     }
   }
-  setHover(properties, type) {
-    if (this.store.getState().hoverInfo.name !== properties.name) {
-      const data = [];
-      if (type === 'country') {
-        const cd = this.store.getState().countryData;
-        const code = properties.adm0_a3_us;
-        cd.countries[code].data.map(d => data.push({ x: d.year, y: d.value }));
-      } else if (type === 'province') {
-        const pd = this.store.getState().provinceData;
-        const ccode = properties.adm0_a3; // should check adm0_a3 is always same as _a3_us
-        const code = properties.adm1_code;
-        const varNum = this.props.varNum;
-        if (pd[ccode] && pd[ccode][varNum] && pd[ccode][varNum].provinces) {
-          pd[ccode][varNum].provinces[code].data.map(
-            d => data.push({ x: d.year, y: d.value }));
-        }
-      }
+  setHover(features, type, map) {
+    const curName = this.store.getState().hoverInfo.name;
 
-      this.store.dispatch(setHoverInfo({
-        name: properties.name,
-        properties,
-        type,
-        data
-      }));
-    }
-  }
-  unsetHover() {
-    if (this.store.getState().hoverInfo.name !== undefined) {
+    if (features.length === 0) {
       this.store.dispatch(setHoverInfo({}));
+      map.setFilter(`${type}-fills-hover`, ['==', 'name', '']);
+      // eslint-disable-next-line no-param-reassign
+      map.getCanvas().style.cursor = '';
+    } else {
+      const properties = features[0].properties;
+      if (properties.name !== curName) {
+        map.setFilter(`${type}-fills-hover`, ['==', 'name', properties.name]);
+        if (type === 'country') {
+          // eslint-disable-next-line no-param-reassign
+          map.getCanvas().style.cursor = 'pointer';
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          map.getCanvas().style.cursor = '';
+        }
+
+        let data;
+        if (type === 'country') {
+          data = getXYData(this.store.getState().countryData, properties, type,
+            this.props.varNum);
+        } else if (type === 'province') {
+          data = getXYData(this.store.getState().provinceData, properties, type,
+            this.props.varNum);
+        }
+
+        this.store.dispatch(setHoverInfo({
+          name: properties.name,
+          properties,
+          type,
+          data
+        }));
+      }
     }
   }
   removeProvinceLayer(map) {

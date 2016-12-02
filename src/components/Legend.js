@@ -22,7 +22,7 @@ const Legend = ({ sheet: { classes }, countryData, hoverInfo }) => {
   const delta = countryData.tcks[1] - countryData.tcks[0];
   if (hoverInfo.name !== undefined) {
     let val = Math.round(hoverInfo.properties.avg_val);
-    val = (((val - st + delta) / delta) * legend.entryWidth) + legend.left;
+    val = ((((val - st) + delta) / delta) * legend.entryWidth) + legend.left;
     // https://codepen.io/chrisroselli/pen/oXyqRa - add animation
     curMarker = (
       <line

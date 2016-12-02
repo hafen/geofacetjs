@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
 import ui from './ui';
 import { viewMode, appId, map, mapLoaded, countries, variable, selected, appBBox,
-  hoverInfo, geojsonCountries, geojsonProvinces, countryData, provinceData } from './app';
+  hoverInfo, geojsonCountries, geojsonProvinces, countryData, provinceData,
+  errorMsg } from './app';
 // import _config from './_config';
 
 const app = combineReducers({
@@ -18,7 +19,8 @@ const app = combineReducers({
   provinceData,
   appBBox,
   variable,
-  ui
+  ui,
+  errorMsg
   // _config,
 });
 

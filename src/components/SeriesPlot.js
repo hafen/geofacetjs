@@ -5,7 +5,6 @@ import { line } from 'd3-shape';
 import { timeFormat } from 'd3-time-format';
 import { ticks } from 'd3-array';
 import { select } from 'd3-selection';
-// import { format } from 'd3-format';
 
 const SeriesPlotD3 = {};
 
@@ -60,52 +59,41 @@ const getTicksAndRange = (range) => {
 };
 
 const makeSeriesPlot = (props, selection) => {
-  const bottomPad = 33;
-  const leftPad = 33;
-  const rightPad = 10;
+  const bPad = 33;
+  const lPad = 33;
+  const rPad = 10;
 
   const xtr = getTicksAndRange(props.xrange);
   const ytr = getTicksAndRange(props.yrange);
 
   const xs = scaleLinear()
     .domain(xtr.range)
-    .range([leftPad, props.width - rightPad]);
+    .range([lPad, props.width - rPad]);
 
   const ys = scaleLinear()
     .domain(ytr.range)
-    .range([props.height - bottomPad, 0]);
+    .range([props.height - bPad, 0]);
 
   const makeXGrid = () => axisBottom(xs).tickValues(xtr.ticks);
   const makeYGrid = () => axisLeft(ys).tickValues(ytr.ticks);
 
   selection.append('g')
     .attr('class', 'grid')
-    .attr('transform', `translate(0,${props.height - bottomPad})`)
+    .attr('transform', `translate(0,${props.height - bPad})`)
     .call(makeXGrid()
       .tickSizeOuter(0)
-      .tickSizeInner(-(props.height - bottomPad))
+      .tickSizeInner(-(props.height - bPad))
       .tickFormat('')
     );
 
   selection.append('g')
     .attr('class', 'grid')
-    .attr('transform', `translate(${leftPad},0)`)
+    .attr('transform', `translate(${lPad},0)`)
     .call(makeYGrid()
       .tickSizeOuter(0)
-      .tickSizeInner(-(props.width - leftPad - rightPad))
+      .tickSizeInner(-(props.width - lPad - rPad))
       .tickFormat('')
     );
-
-  // const makeXGrid = () => axisBottom(xs).ticks(5);
-
-  // selection.append('g')
-  //   .attr('class', 'grid')
-  //   .attr('transform', `translate(0,${props.height}`)
-  //   .call(makeXGrid()
-  //     .tickSize(-props.height)
-  //     .tickFormat('')
-  //   );
-
 
   const xaxis = axisBottom(xs)
     .scale(xs)
@@ -125,7 +113,7 @@ const makeSeriesPlot = (props, selection) => {
     .y(d => ys(d.y));
 
   selection.append('g')
-    .attr('transform', `translate(${leftPad},0)`)
+    .attr('transform', `translate(${lPad},0)`)
     .attr('class', 'y axis')
     .call(yaxis)
     .selectAll('text')
@@ -135,21 +123,22 @@ const makeSeriesPlot = (props, selection) => {
 
   selection.append('text')
     .attr('text-anchor', 'middle')
-    .attr('transform', `translate(9,${(props.height - bottomPad) / 2})rotate(-90)`)
+    .attr('transform', `translate(9,${(props.height - bPad) / 2})rotate(-90)`)
     .attr('font-size', '12px')
     .attr('font-weight', 'bold')
     .text('Children Stunted (%)');
 
   selection.append('g')
     .attr('class', 'x axis')
-    .attr('transform', `translate(0,${(props.height - bottomPad)})`)
+    .attr('transform', `translate(0,${(props.height - bPad)})`)
     .call(xaxis)
     .selectAll('text')
     .attr('dy', '8px');
 
   selection.append('text')
     .attr('text-anchor', 'middle')
-    .attr('transform', `translate(${(props.width - leftPad - rightPad) / 2 + leftPad},${props.height - 1})`)
+    .attr('transform',
+      `translate(${((props.width - lPad - rPad) / 2) + lPad},${props.height - 1})`)
     .attr('font-size', '12px')
     .attr('font-weight', 'bold')
     .text('Year');
@@ -162,32 +151,6 @@ const makeSeriesPlot = (props, selection) => {
     .attr('r', 4)
     .style('stroke-width', '5')
     .attr('opacity', 1);
-
-  // const tooltip = select('#tooltip')
-  //   .attr('class', 'tooltip')
-  //   .style('opacity', 0);
-
-  // const r1 = format('.1f');
-  // selection.selectAll('.circle2')
-  // .data(props.data)
-  // .enter().append('circle')
-  // .attr('cx', d => xs(d.x))
-  // .attr('cy', d => ys(d.y))
-  // .attr('r', 9)
-  // .attr('opacity', 0)
-  // .on('mouseover', (d) => {
-  //   tooltip.transition()
-  //     .duration(100)
-  //     .style('opacity', 0.8);
-  //   tooltip.html(`${d.x}<br/>${r1(d.y, 1)}%`)
-  //     .style('left', `${xs(d.x) - 48}px`)
-  //     .style('top', `${ys(d.y) - 28}px`);
-  // })
-  // .on('mouseout', () => {
-  //   tooltip.transition()
-  //     .duration(100)
-  //     .style('opacity', 0);
-  // });
 
   selection.append('path')
     .datum(props.data)
@@ -207,49 +170,3 @@ SeriesPlotD3.update = (props, selection) => {
   selection.selectAll('*').remove();
   makeSeriesPlot(props, selection);
 };
-
-
-// SeriesPlotD3.enter = (props, pars, selection) => {
-//   const plotArea = selection.append('g');
-
-//   const selRange = Object.assign([], pars.xrange);
-//   if (props.filterState.value) {
-//     if (props.filterState.value.from) {
-//       selRange[0] = props.filterState.value.from;
-//     }
-//     if (props.filterState.value.to) {
-//       selRange[1] = props.filterState.value.to;
-//     }
-//   }
-
-//   plotArea.append('path')
-//     .attr('class', 'bar foreground')
-//     .datum(props.condDist.dist)
-//     .attr('clip-path', `url(#clip-${props.name})`);
-
-//   if (props.filterState.value) {
-//     plotArea.selectAll('.foreground')
-//       .attr('fill', 'rgb(255, 170, 10)');
-//   } else {
-//     plotArea.selectAll('.foreground')
-//       .attr('fill', 'rgb(255, 210, 127)');
-//   }
-
-//   const gAxis = selection.append('g')
-//     .attr('class', 'axis')
-//     .attr('transform', `translate(0,${(props.height - pars.axisPad) + 1})`)
-//     .call(pars.axis);
-
-//   // style the axis
-//   gAxis.select('path')
-//     .attr('fill', 'none')
-//     .attr('stroke', '#000')
-//     .attr('stroke-opacity', 0.4)
-//     .attr('shape-rendering', 'crispEdges');
-//   gAxis.selectAll('.tick')
-//     .attr('opacity', 0.4);
-//   // gAxis.selectAll('.tick text')
-//   //   .attr('font', '10px');
-
-//   selection.selectAll('.bar').attr('d', d => pars.barPath(d, pars));
-// };

@@ -14,14 +14,12 @@ const ViewToggle = ({ sheet: { classes }, toggleViewMode }) => (
       onChange={toggleViewMode}
     >
       <RadioButton
-        disabled
         value="geo"
         label="Map"
         style={{ marginBottom: 5 }}
         iconStyle={{ marginRight: 8 }}
       />
       <RadioButton
-        disabled
         value="grid"
         label="Geo Grid"
         style={{ marginBottom: 5 }}
