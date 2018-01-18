@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -18,7 +19,7 @@ import SeriesPlot from './SeriesPlot';
 // const addCommas = x =>
 //   x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-const InfoOverlay = ({ sheet: { classes }, hoverInfo, xrange, yrange, viewMode }) => {
+const InfoOverlay = ({ classes, hoverInfo, xrange, yrange, viewMode }) => {
   let res = <div />;
   if (viewMode === 'grid') {
     res = <div />;
@@ -115,11 +116,11 @@ const InfoOverlay = ({ sheet: { classes }, hoverInfo, xrange, yrange, viewMode }
 };
 
 InfoOverlay.propTypes = {
-  sheet: React.PropTypes.object,
-  hoverInfo: React.PropTypes.object,
-  xrange: React.PropTypes.array,
-  yrange: React.PropTypes.array,
-  viewMode: React.PropTypes.string
+  classes: PropTypes.object,
+  hoverInfo: PropTypes.object,
+  xrange: PropTypes.array,
+  yrange: PropTypes.array,
+  viewMode: PropTypes.string
 };
 
 // ------ static styles ------

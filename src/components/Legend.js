@@ -1,11 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 // import { quantize } from 'd3-interpolate';
 import uiConsts from '../assets/styles/uiConsts';
 
-const Legend = ({ sheet: { classes }, countryData, hoverInfo }) => {
+const Legend = ({ classes, countryData, hoverInfo }) => {
   if (!countryData || !countryData.tcks) {
     return <div />;
   }
@@ -103,9 +104,9 @@ const Legend = ({ sheet: { classes }, countryData, hoverInfo }) => {
 };
 
 Legend.propTypes = {
-  sheet: React.PropTypes.object,
-  countryData: React.PropTypes.object,
-  hoverInfo: React.PropTypes.object
+  classes: PropTypes.object,
+  countryData: PropTypes.object,
+  hoverInfo: PropTypes.object
 };
 
 // ------ static styles ------

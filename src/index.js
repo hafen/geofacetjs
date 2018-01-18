@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import createLogger from 'redux-logger';
+import { createLogger } from 'redux-logger';
 import { json as d3json } from 'd3-request';
 import { mean, extent, min, max, ticks } from 'd3-array';
 import { scaleQuantize } from 'd3-scale';
 import geojsonExtent from 'geojson-extent';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -534,8 +536,8 @@ class Root extends Component {
 }
 
 Root.propTypes = {
-  appId: React.PropTypes.string,
-  varNum: React.PropTypes.number
+  appId: PropTypes.string,
+  varNum: PropTypes.number
 };
 
 const geofacet = (id, varNum) => {

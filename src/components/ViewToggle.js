@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 // import { createSelector } from 'reselect';
@@ -6,7 +7,7 @@ import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 
 import { setViewMode } from '../actions';
 
-const ViewToggle = ({ sheet: { classes }, toggleViewMode }) => (
+const ViewToggle = ({ classes, toggleViewMode }) => (
   <div className={classes.outer}>
     <RadioButtonGroup
       name="view"
@@ -36,8 +37,8 @@ const ViewToggle = ({ sheet: { classes }, toggleViewMode }) => (
 // />
 
 ViewToggle.propTypes = {
-  sheet: React.PropTypes.object,
-  toggleViewMode: React.PropTypes.func
+  classes: PropTypes.object,
+  toggleViewMode: PropTypes.func
 };
 
 // ------ static styles ------

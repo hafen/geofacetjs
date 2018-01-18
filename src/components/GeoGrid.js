@@ -1,5 +1,6 @@
 import React from 'react';
-import ReactTransitionGroup from 'react-addons-transition-group';
+import PropTypes from 'prop-types';
+import TransitionGroup from 'react-transition-group/TransitionGroup';
 import injectSheet from 'react-jss';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
@@ -17,7 +18,7 @@ class GeoGrid extends React.Component {
   componentDidUpdate() {
   }
   render() {
-    const { classes } = this.props.sheet;
+    const { classes } = this.props;
 
     let feats = [];
     let gp = {};
@@ -43,7 +44,7 @@ class GeoGrid extends React.Component {
           width={this.props.width}
           height={this.props.height}
         >
-          <ReactTransitionGroup component="g">
+          <TransitionGroup component="g">
             {feats.map((d, i) => {
               const type = 'country'; // will support province in the future...
               let data;
@@ -68,7 +69,7 @@ class GeoGrid extends React.Component {
                 />
               );
             })}
-          </ReactTransitionGroup>
+          </TransitionGroup>
         </svg>
       </div>
     );
@@ -85,15 +86,15 @@ class GeoGrid extends React.Component {
 // />
 
 GeoGrid.propTypes = {
-  sheet: React.PropTypes.object,
-  width: React.PropTypes.number,
-  height: React.PropTypes.number,
-  viewMode: React.PropTypes.string,
-  map: React.PropTypes.object,
-  geojsonCountries: React.PropTypes.object,
-  cd: React.PropTypes.object,
-  pd: React.PropTypes.object,
-  varNum: React.PropTypes.number
+  classes: PropTypes.object,
+  width: PropTypes.number,
+  height: PropTypes.number,
+  viewMode: PropTypes.string,
+  map: PropTypes.object,
+  geojsonCountries: PropTypes.object,
+  cd: PropTypes.object,
+  pd: PropTypes.object,
+  varNum: PropTypes.number
 };
 
 // ------ static styles ------

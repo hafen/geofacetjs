@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import 'd3-transition';
 import { geoMercator, geoPath } from 'd3-geo';
 import { select } from 'd3-selection';
@@ -194,13 +195,13 @@ class CountryPolygon extends React.Component {
 }
 
 CountryPolygon.propTypes = {
-  d: React.PropTypes.object,
-  grid: React.PropTypes.object,
-  center: React.PropTypes.object,
-  zoom: React.PropTypes.number,
-  data: React.PropTypes.array,
-  cd: React.PropTypes.object,
-  map: React.PropTypes.object
+  d: PropTypes.object,
+  grid: PropTypes.object,
+  center: PropTypes.object,
+  zoom: PropTypes.number,
+  data: PropTypes.array,
+  cd: PropTypes.object,
+  map: PropTypes.object
 };
 
 export default CountryPolygon;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { scaleLinear } from 'd3-scale';
 import { axisBottom, axisLeft } from 'd3-axis';
 import { line } from 'd3-shape';
@@ -32,11 +33,11 @@ class SeriesPlot extends React.Component {
 }
 
 SeriesPlot.propTypes = {
-  width: React.PropTypes.number,
-  height: React.PropTypes.number,
-  data: React.PropTypes.array, // eslint-disable-line react/no-unused-prop-types
-  xrange: React.PropTypes.array, // eslint-disable-line react/no-unused-prop-types
-  yrange: React.PropTypes.array // eslint-disable-line react/no-unused-prop-types
+  width: PropTypes.number,
+  height: PropTypes.number,
+  data: PropTypes.array, // eslint-disable-line react/no-unused-prop-types
+  xrange: PropTypes.array, // eslint-disable-line react/no-unused-prop-types
+  yrange: PropTypes.array // eslint-disable-line react/no-unused-prop-types
 };
 
 export default SeriesPlot;
